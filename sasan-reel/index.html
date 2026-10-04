@@ -1,0 +1,41 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Sasan / Inside My Head</title>
+<style>
+  @font-face { font-family: 'Anton'; src: url('fonts/Anton-Regular.woff2') format('woff2'); }
+  @font-face { font-family: 'InterB'; src: url('fonts/Inter-Bold.woff2') format('woff2'); font-weight: 700; }
+  html, body { margin: 0; background: #080B10; }
+  canvas { display: block; width: 540px; height: 960px; }
+  #ui { position: fixed; left: 560px; top: 12px; color: #F4EFD9; font: 13px/1.5 monospace; }
+</style>
+</head>
+<body>
+<canvas id="c" width="1080" height="1920"></canvas>
+<div id="ui"></div>
+<script src="reel.js"></script>
+<script>
+  // Interactive preview: open index.html in a browser; ?f=123 jumps to a frame, ?play plays with audio.
+  window.ready = (async () => {
+    await document.fonts.load('200px Anton');
+    await document.fonts.load('700 30px InterB');
+    initReel(document.getElementById('c'));
+  })();
+  const q = new URLSearchParams(location.search);
+  if (!navigator.webdriver) {
+    window.ready.then(() => {
+      const ui = document.getElementById('ui');
+      if (q.has('play')) {
+        const a = new Audio('audio/narration.mp3');
+        document.body.onclick = () => { a.currentTime = 0; a.play(); };
+        const tick = () => { const f = Math.min(TOTAL - 1, Math.floor(a.currentTime * FPS)); renderFrame(f); ui.textContent = 'frame ' + f + ' — click to play'; requestAnimationFrame(tick); };
+        tick();
+      } else {
+        const f = +(q.get('f') || 0); renderFrame(f); ui.textContent = 'frame ' + f;
+      }
+    });
+  }
+</script>
+</body>
+</html>
