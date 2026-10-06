@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dog Disco</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #0b0910; overflow: hidden; }
+  body { display: flex; align-items: center; justify-content: center; }
+  canvas { height: min(100vh, calc(100vw * 16 / 9)); width: auto; aspect-ratio: 9 / 16; display: block; cursor: pointer; image-rendering: pixelated; }
+</style>
+</head>
+<body>
+<canvas id="c" width="1080" height="1920"></canvas>
+<script>
+"use strict";
+// =====================================================================
+//  DOG DISCO — 9:16, 2.0s @ 120 BPM (one bar), 24fps, pixel style at 135x240 (8 px per pixel).
+//  An orange pixel dog dances one bar on a light-up disco floor: one more tile lights each beat, it spins,
+//  freezes in a crouch (the silence), then jumps into a paws-up pose as the whole floor flashes (the loudest hit)
+//  and lands in its opening pose, so the loop is seamless.
+//  Build: node .claude/skills/animate/tools/build.mjs pieces/dog-dance
+// =====================================================================
+const FPS = 24, W = 1080, H = 1920;
+const BPM = 120, BEAT = 60 / BPM, E8 = BEAT / 2, E16 = BEAT / 4;
+const DURATION = 2.0;
+const NFRAMES = Math.round(DURATION * FPS);
+const LOOP_T = NFRAMES / FPS;
+const SAFE = { top: 240, bottom: 420, right: 140 };
+const HAND = '"Segoe UI", "Helvetica Neue", Arial, sans-serif';   // only the storyboard sheet uses a system font
+const CX = 472;
+
+const ERA_LIST = [[0, 2, () => sceneDisco()]];
+const SHOTS = [
+  ['disco', 0, 0.0, 2.0, 'the dog dances one bar on a light-up floor'],
+];
+const TIMELINE = {
+  width: W, height: H, fps: FPS, bpm: BPM, duration: DURATION, frames: NFRAMES, loop: LOOP_T, safe: SAFE,
+  format: 'single-shot loop',
+  shots: SHOTS.map(([key, era, t0, t1, title], i) => ({ id: i + 1, key, era, t0, t1, title })),
+  cuts: [],
+  morphs: [],
+  cues: { step2: 0.5, spin: 1.0, freeze: 1.25, jump: 1.5, land: 1.917 },
+  acts: [
+    { name: '1 Groove', role: 'build',   t0: 0.0,  t1: 1.0 },
+    { name: '2 Spin',   role: 'peak',    t0: 1.0,  t1: 1.25 },
+    { name: '3 Freeze', role: 'silence', t0: 1.25, t1: 1.5 },
+    { name: '4 Pose',   role: 'gift',    t0: 1.5,  t1: 2.0 },
+  ],
+  board: [
+    { t: 0.25,  title: 'beat 1: bob and step left', sound: 'bass + pulse 8ths', next: 'steps right' },
+    { t: 0.75,  title: 'beat 2: step right, paw up', sound: 'arps go to 16ths', next: 'spins' },
+    { t: 1.083, title: 'beat 3: the spin', sound: 'busiest: arps + sweep', next: 'freezes' },
+    { t: 1.333, title: 'freeze: crouch, beams lock', sound: 'near-silence', next: 'jumps' },
+    { t: 1.667, title: 'beat 4: paws-up pose, WOOF!', sound: 'loudest: chord stab + sub + bark', next: 'lands = frame 0' },
+  ],
+  narration: [],
+};
+window.TIMELINE = TIMELINE;

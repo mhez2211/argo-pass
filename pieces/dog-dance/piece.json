@@ -1,0 +1,8 @@
+{
+  "name": "dog-dance",
+  "title": "Dog Disco",
+  "format": { "width": 1080, "height": 1920, "fps": 24, "bpm": 120, "duration": 2.0, "frames": 48 },
+  "storyFormat": "single-shot loop (fixed hero, one stage, last frame flows into frame 0)",
+  "style": "pixel",
+  "review": { "safe": { "top": 240, "bottom": 420, "right": 140 }, "refs": {} }
+}

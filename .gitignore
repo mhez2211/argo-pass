@@ -1,0 +1,4 @@
+# animate skill: renders and intermediates are rebuilt by the tools
+pieces/**/frames/
+pieces/**/renders/
+pieces/**/review/
